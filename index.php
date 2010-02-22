@@ -14,12 +14,36 @@ $m = new Movies(98116);
 <body>
 <div id="wrapper">
 
-<?php 
+<?php
 $m->load();
-echo '<pre>';
-print_r($m->movies);
-echo '</pre>';
+
+function filterLowRatings($movie)
+{ 
+	return $movie->rating > 2.5;
+}
+$filteredMovies = array_filter($m->movies, "filterLowRatings");
+
+function compareRatings($a, $b)
+{
+	if ($a->rating == $b->rating) {
+        return 0;
+    }
+    return ($a->rating < $b->rating) ? 1 : -1;
+}
+usort($filteredMovies, "compareRatings");
 ?>
+
+<ul>
+<?php foreach($filteredMovies as $movie) {?>
+	<li><strong><?php echo $movie->name;?></strong> <?php echo "(".$movie->rating.")";?><br />
+	<ul>
+	<?php foreach($movie->theaters as $theater => $showtimes) {?>
+		<li><?php echo $theater.": ".implode(" ", $showtimes);?></li>
+	<?php }?>
+	</ul>
+	</li>
+<?php } ?>
+</ul>
 
 </div>
 

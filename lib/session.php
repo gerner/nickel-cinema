@@ -3,6 +3,7 @@
  * makes sure the current user has already authorized us with netflix
  */
 session_name(NICKEL_CINEMA_SESSION);
+if(NICKEL_CINEMA_SESSION_LIFETIME >= 0) session_set_cookie_params(NICKEL_CINEMA_SESSION_LIFETIME);
 session_start();
 
 if(!$_SESSION["oauth_token"] && !$_skip_netflix)
