@@ -109,42 +109,53 @@ class Movie
 	
 	static function load_many($movies)
 	{
-		$titleRefs = array();
-		foreach($movies as $movie)
+		if(SPOOF_DATA)
 		{
-			$movie->loadTitle();
-			$titleRefs[] = $movie->netflixRefURL;
+			foreach($movies as $movie)
+			{
+				$movie->netflixInfoURL = "http://example.com/$movie->name";
+				$movie->rating = (mt_rand() % 50)/10.0;
+			}
 		}
-		
-		//now get user ratings!
-		$curlcode = 0;
-		while($curlcode != 200)
+		else
 		{
-			$ch = curl_init();
-			$url = "http://api.netflix.com/users/".$_SESSION["user_id"]."/ratings/title/predicted";
-			$params = array("oauth_token" => $_SESSION["oauth_token"], "title_refs" => implode(",", $titleRefs));
-			$requestURL = GenerateOAuthRequest("GET", $url, $params, NETFLIX_CONSUMER_KEY, NETFLIX_SHARED_SECRET."&".$_SESSION["oauth_token_secret"]);
-			$ch = curl_init();
-					
-			// set URL and other appropriate options
-			curl_setopt($ch, CURLOPT_URL, $requestURL);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			$titleRefs = array();
+			foreach($movies as $movie)
+			{
+				$movie->loadTitle();
+				$titleRefs[] = $movie->netflixRefURL;
+			}
 			
-			$response = curl_exec($ch);
-			$curlcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			curl_close($ch);
-			$tries++;
-			if($tries > 2)
-				die("could not get ratings info from netflix");
-			if($curlcode == 403)
-				sleep(1);
-		}
-		$domDoc = new DOMDocument('1.0', 'UTF-8');
-		$domDoc->loadXML($response);
-		$xpath = new DOMXPath($domDoc);
-		foreach($movies as $movie)
-		{
-			$movie->rating = $xpath->query("//link[@href='".$movie->netflixRefURL."']/../predicted_rating")->item(0)->nodeValue;
+			//now get user ratings!
+			$curlcode = 0;
+			while($curlcode != 200)
+			{
+				$ch = curl_init();
+				$url = "http://api.netflix.com/users/".$_SESSION["user_id"]."/ratings/title/predicted";
+				$params = array("oauth_token" => $_SESSION["oauth_token"], "title_refs" => implode(",", $titleRefs));
+				$requestURL = GenerateOAuthRequest("GET", $url, $params, NETFLIX_CONSUMER_KEY, NETFLIX_SHARED_SECRET."&".$_SESSION["oauth_token_secret"]);
+				$ch = curl_init();
+						
+				// set URL and other appropriate options
+				curl_setopt($ch, CURLOPT_URL, $requestURL);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				
+				$response = curl_exec($ch);
+				$curlcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+				curl_close($ch);
+				$tries++;
+				if($tries > 2)
+					die("could not get ratings info from netflix");
+				if($curlcode == 403)
+					sleep(1);
+			}
+			$domDoc = new DOMDocument('1.0', 'UTF-8');
+			$domDoc->loadXML($response);
+			$xpath = new DOMXPath($domDoc);
+			foreach($movies as $movie)
+			{
+				$movie->rating = $xpath->query("//link[@href='".$movie->netflixRefURL."']/../predicted_rating")->item(0)->nodeValue;
+			}
 		}
 	}
 }?>

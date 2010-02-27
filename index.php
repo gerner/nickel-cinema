@@ -35,7 +35,7 @@ usort($filteredMovies, "compareRatings");
 
 <ul>
 <?php foreach($filteredMovies as $movie) {?>
-	<li><strong><?php echo $movie->name;?></strong> <?php echo "(".$movie->rating.")";?><br />
+	<li><strong><a href="<?php echo $movie->netflixInfoURL?>"><?php echo $movie->name;?></a></strong> <?php echo "(".$movie->rating.")";?><br />
 	<ul>
 	<?php foreach($movie->theaters as $theater => $showtimes) {?>
 		<li><?php echo $theater.": ".implode(" ", $showtimes);?></li>

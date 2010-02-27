@@ -12,23 +12,53 @@ class Movies
 	
 	function load()
 	{
-		//using this: http://hurwi.net/blog/?p=17
-		//curl --referer "http://hurwi.net/map/" "http://hurwi.net/map/parser2xml.php?loc=98116"
-		// create a new cURL resource
-		$ch = curl_init();
-		
-		// set URL and other appropriate options
-		curl_setopt($ch, CURLOPT_URL, "http://hurwi.net/map/parser2xml.php?loc=".$this->zipcode);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_REFERER, "http://hurwi.net/map/");
-		
-		$moviesResponse = curl_exec($ch);
-		curl_close($ch);
-		
-		echo "<!--\n";
-		echo $moviesResponse;
-		echo "\n-->";
-		
+		if(!SPOOF_DATA)
+		{
+			//using this: http://hurwi.net/blog/?p=17
+			//curl --referer "http://hurwi.net/map/" "http://hurwi.net/map/parser2xml.php?loc=98116"
+			// create a new cURL resource
+			$ch = curl_init();
+			
+			// set URL and other appropriate options
+			curl_setopt($ch, CURLOPT_URL, "http://hurwi.net/map/parser2xml.php?loc=".$this->zipcode);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_REFERER, "http://hurwi.net/map/");
+			
+			$moviesResponse = curl_exec($ch);
+			curl_close($ch);
+		}
+		else
+		{
+			$tnames = array("Foo Cinemas", "Majestic Baz", "Blerf Theaters", "Bingo Odeon", "Blazzo Screen Pictures");
+			$mnames = array("Return of the Foo", "The Baz Strikes Back", "Blerf: New Moon", "Bingo: Harvest Moon", "Blazzo in Space!");
+			$times = array("8:00am", "8:40am", "10:00am", "11:00am", "12:00pm", "12:10pm", "1:30pm", "2:30pm", "4:00pm", "4:45pm", "6:30pm");
+			$moviesResponse = "<Theaters>";
+			foreach($tnames as $name)
+			{
+				$moviesResponse .= "<Theater><TheaterName>$name</TheaterName>";
+				$moviesResponse .= "<Movies>";
+				foreach($mnames as $name2)
+				{
+					$cnt_times = count($times);
+					$movieTimes = array();
+					if(mt_rand()%3)
+					{
+						$i = mt_rand()%($cnt_times+1);
+						while($i < $cnt_times)
+						{
+							$movieTimes[] = $times[$i];
+							$i = (mt_rand() % ($cnt_times-$i))+$i+1;
+						}
+						if(count($movieTimes) > 0)
+							$moviesResponse .= "<Movie><MovieName>$name2</MovieName><Times>".implode(" ", $movieTimes)."</Times></Movie>";
+					}
+				}
+				$moviesResponse .= "</Movies>";
+				$moviesResponse .= "</Theater>";
+			}
+			$moviesResponse .= "</Theaters>";
+		}
+			
 		//document structured like:
 		//- theaters
 		//	- theater

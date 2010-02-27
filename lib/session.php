@@ -6,7 +6,7 @@ session_name(NICKEL_CINEMA_SESSION);
 if(NICKEL_CINEMA_SESSION_LIFETIME >= 0) session_set_cookie_params(NICKEL_CINEMA_SESSION_LIFETIME);
 session_start();
 
-if(!$_SESSION["oauth_token"] && !$_skip_netflix)
+if(!$_SESSION["oauth_token"] && !$_skip_netflix && !SPOOF_DATA)
 {
 	$requestURL = GenerateOAuthRequest("GET", "http://api.netflix.com/oauth/request_token", array(), NETFLIX_CONSUMER_KEY, NETFLIX_SHARED_SECRET."&");
 	$ch = curl_init();
