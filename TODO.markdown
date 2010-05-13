@@ -2,15 +2,21 @@ Nickel Cinema TODO
 ==================
 
 Done
+----
+
 * Register nickelcinema.*
  
-TODO:
+TODO
+----
+
 * movie store (with showtimes?)
 * user login
 * experience around auth external services (netflix, twitter, facebook)
 * basic UI
  
-Biz:
+Biz
+---
+
 * ticket sales
 * formal way of getting showtimes
 * ticket discounts
